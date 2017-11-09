@@ -2,14 +2,50 @@
 target
 *.class
 
-# Eclipse
-.classpath
-.project
-.settings/
-
 # Intellij IDEA
 .idea/
 *.iml
 *.iws
 
+# OS
 .DS_Store
+
+# Binaries
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+*.war
+*.ear
+*.sar
+
+# gradle
+.gradle/
+gradlew.bat
+gradle/wrapper/gradle-wrapper.properties
+
+# folders
+/out/
+
+# Thumbnails
+._*
+
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk

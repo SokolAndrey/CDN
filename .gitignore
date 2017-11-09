@@ -1,0 +1,15 @@
+# Java
+target
+*.class
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# Intellij IDEA
+.idea/
+*.iml
+*.iws
+
+.DS_Store

@@ -49,8 +49,7 @@ public class ImageService {
         Status status = uploadResult.getStatus();
         String imageUrl = null;
         if (Status.OK.equals(status)) {
-            imageUrl = generateUrl(uploadResult.getImageId(), hostName);
-            pictureStatisticRepository.save(new PictureMetaData(imageUrl, 0L));
+            pictureStatisticRepository.save(new PictureMetaData(uploadResult.getImageId(), 0L));
         }
         if (Status.ALREADY_EXIST.equals(status) || Status.OK.equals(status)) {
             imageUrl = hostName + FILE_PATH + uploadResult.getImageId();

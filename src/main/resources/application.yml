@@ -1,6 +1,6 @@
 storage:
-  meta: ~/CDN/data
-  files: /Users/asokol/CDN/data
+  meta: ./data
+  files: ./data
 
 authentication.user:
   name: popa

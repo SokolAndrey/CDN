@@ -2,7 +2,7 @@ package asokol.dto;
 
 import lombok.Value;
 
-/**`
+/**
  * DTO for image statistic.
  */
 @Value

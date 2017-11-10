@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Map;
 
 /**
@@ -32,14 +34,11 @@ public class FileUploadingController {
         this.imageService = imageService;
     }
 
-    // TODO(asokol): 11/7/17 201 response
-// TODO(asokol): 11/10/17 java doc for responses
-
     /**
      * POST method for uploading an image {@code file}.
      * <p>
      * Responses:
-     * - 200=OK=        - in case of successful uploading.
+     * - 201=CREATED=   - in case of successful uploading.
      * - 404=NOT FOUND= - in case of unsuccessful uploading.
      *
      * @param request http request.
@@ -47,13 +46,14 @@ public class FileUploadingController {
      * @return URL where the uploaded file is available.
      */
     @PostMapping("file")
-    public UrlDTO uploadFile(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
+    public ResponseEntity<UrlDTO> uploadFile(HttpServletRequest request, @RequestParam("file") MultipartFile file) throws URISyntaxException {
         String hostName = fetchHost(request, "file");
         String url = imageService.saveImage(file, hostName);
-        return new UrlDTO(url);
-    }
+        URI uri = new URI(url);
+        return ResponseEntity.created(uri)
+                .body(new UrlDTO(url));
 
-    // TODO(asokol): 11/9/17 code response
+    }
 
     /**
      * GET method for retrieving an image by its ID.
@@ -73,8 +73,6 @@ public class FileUploadingController {
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.IMAGE_JPEG_VALUE)
                 .body(file);
     }
-
-    // TODO(asokol): 11/9/17 code response
 
     /**
      * GET method for retrieving statistics about existed images.

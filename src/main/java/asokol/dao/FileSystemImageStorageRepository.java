@@ -1,6 +1,8 @@
 package asokol.dao;
 
+import asokol.dao.exception.DirCreationException;
 import asokol.dao.exception.FileCreationException;
+import asokol.dao.exception.FileReadingException;
 import asokol.dto.UploadResultDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
@@ -42,6 +45,8 @@ public class FileSystemImageStorageRepository implements ImageStorageRepository 
      *
      * @param image input image.
      * @return the result of the uploading an image. See {@link UploadResultDTO} for details.
+     * @throws DirCreationException  when the directory cannot be created.
+     * @throws FileCreationException when the file cannot be created or written.
      */
     public UploadResultDTO saveImage(MultipartFile image) {
         File dir = new File(applicationDir);
@@ -50,7 +55,7 @@ public class FileSystemImageStorageRepository implements ImageStorageRepository 
             if (!dir.exists()) {
                 if (!dir.mkdirs()) {
                     log.error("Directory {} cannot be created", dir.toString());
-                    throw new IllegalStateException("Cannot create a dir for storing pictures");
+                    throw new DirCreationException("Cannot create a dir for storing pictures");
                 }
             }
             id = generateId(image);
@@ -71,8 +76,6 @@ public class FileSystemImageStorageRepository implements ImageStorageRepository 
         return new UploadResultDTO(id, UploadResultDTO.Status.OK);
     }
 
-    // TODO(asokol): 11/7/17 catch exception
-
     /**
      * Gets an image by its ID.
      *
@@ -86,11 +89,12 @@ public class FileSystemImageStorageRepository implements ImageStorageRepository 
             if (resource.exists() || resource.isReadable()) {
                 return resource;
             } else {
-                throw new IllegalStateException("Couldn't read a file: " + path);
+                log.error("Couldn't read a file: {}", path);
+                throw new FileReadingException("Couldn't read a file: " + path);
             }
         } catch (MalformedURLException e) {
-            e.printStackTrace();
-            throw new IllegalStateException("Couldn't read a file: " + path);
+            log.error("Couldn't read a file: {}", path);
+            throw new FileReadingException("Couldn't read a file: " + path);
         }
     }
 

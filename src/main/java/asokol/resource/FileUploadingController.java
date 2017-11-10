@@ -1,6 +1,6 @@
 package asokol.resource;
 
-import asokol.dto.FileStatisticDTO;
+import asokol.dto.ImageStatisticDTO;
 import asokol.dto.UrlDTO;
 import asokol.service.ImageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +19,9 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
+/**
+ * REST controller for storing and getting images and for getting statistics.
+ */
 @RestController
 public class FileUploadingController {
 
@@ -30,6 +33,19 @@ public class FileUploadingController {
     }
 
     // TODO(asokol): 11/7/17 201 response
+// TODO(asokol): 11/10/17 java doc for responses
+
+    /**
+     * POST method for uploading an image {@code file}.
+     * <p>
+     * Responses:
+     * - 200=OK=        - in case of successful uploading.
+     * - 404=NOT FOUND= - in case of unsuccessful uploading.
+     *
+     * @param request http request.
+     * @param file    incoming file.
+     * @return URL where the uploaded file is available.
+     */
     @PostMapping("file")
     public UrlDTO uploadFile(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
         String hostName = fetchHost(request, "file");
@@ -38,6 +54,17 @@ public class FileUploadingController {
     }
 
     // TODO(asokol): 11/9/17 code response
+
+    /**
+     * GET method for retrieving an image by its ID.
+     * <p>
+     * Responses:
+     * - 200=OK=        - in case of successful response.
+     * - 404=NOT FOUND= - in case the image with given ID is not found.
+     *
+     * @param imageId the ID of the image.
+     * @return requested image.
+     */
     @GetMapping("file/{id}")
     @ResponseBody
     public ResponseEntity<Resource> getFile(@PathVariable("id") String imageId) {
@@ -48,8 +75,15 @@ public class FileUploadingController {
     }
 
     // TODO(asokol): 11/9/17 code response
+
+    /**
+     * GET method for retrieving statistics about existed images.
+     *
+     * @param request http request.
+     * @return download statistics.
+     */
     @GetMapping("statistics")
-    public Map<String, FileStatisticDTO> getStatistics(HttpServletRequest request) {
+    public Map<String, ImageStatisticDTO> getStatistics(HttpServletRequest request) {
         String hostName = fetchHost(request, "statistics");
         return imageService.getStatistics(hostName);
     }

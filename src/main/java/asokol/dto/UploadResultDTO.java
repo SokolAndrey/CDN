@@ -3,6 +3,9 @@ package asokol.dto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Value;
 
+/**
+ * DTO for result of the uploading.
+ */
 @Value
 public class UploadResultDTO {
     String imageId;

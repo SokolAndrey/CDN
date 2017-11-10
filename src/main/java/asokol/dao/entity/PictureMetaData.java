@@ -9,7 +9,9 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import java.io.Serializable;
 
-
+/**
+ * Representation of table for storing downloads statistics.
+ */
 @Data
 @Entity
 @NoArgsConstructor

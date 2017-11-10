@@ -1,7 +1,8 @@
 package asokol.dao;
 
+import asokol.dao.exception.FileCreationException;
 import asokol.dto.UploadResultDTO;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -18,49 +19,67 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Objects;
 
-@Log4j
+/**
+ * File System Image Storage responsible for saving and retrieving images into/from file system.
+ */
+@Slf4j
 @Repository
-public class FileStorageRepository {
+public class FileSystemImageStorageRepository implements ImageStorageRepository {
 
     private static String POSTFIX = ".jpeg";
 
     private String applicationDir;
 
     @Autowired
-    public FileStorageRepository(@Value("${storage.files:}") String applicationDir) {
+    public FileSystemImageStorageRepository(@Value("${storage.files:}") String applicationDir) {
         this.applicationDir = Objects.equals(applicationDir, "")
                 ? new File(".").getAbsolutePath()
-                : applicationDir;
+                : new File(applicationDir).getAbsolutePath();
     }
 
-
+    /**
+     * Saves an image {@code image} into file system.
+     *
+     * @param image input image.
+     * @return the result of the uploading an image. See {@link UploadResultDTO} for details.
+     */
     public UploadResultDTO saveImage(MultipartFile image) {
         File dir = new File(applicationDir);
         String id = null;
         try {
             if (!dir.exists()) {
                 if (!dir.mkdirs()) {
+                    log.error("Directory {} cannot be created", dir.toString());
                     throw new IllegalStateException("Cannot create a dir for storing pictures");
                 }
             }
             id = generateId(image);
             File file = new File(applicationDir + "/" + id + POSTFIX);
             if (file.exists()) {
-                log.info("File is already uploaded");
+                log.info("File with id: {} is already exist", id);
                 return new UploadResultDTO(id, UploadResultDTO.Status.ALREADY_EXIST);
             }
             if (!file.createNewFile()) {
-                throw new IllegalStateException("Cannot create a file");
+                log.error("File {} cannot be created", id);
+                throw new FileCreationException("Cannot create a file");
             }
             image.transferTo(file);
         } catch (IOException | NoSuchAlgorithmException e) {
-            e.printStackTrace();
+            log.error("Cannot write into file with id {}", id);
+            throw new FileCreationException("Cannot write into a file");
         }
         return new UploadResultDTO(id, UploadResultDTO.Status.OK);
     }
 
     // TODO(asokol): 11/7/17 catch exception
-    public Resource readImageFromPath(String imageId) {
+
+    /**
+     * Gets an image by its ID.
+     *
+     * @param imageId image ID.
+     * @return requested image.
+     */
+    public Resource getImage(String imageId) {
         Path path = Paths.get(applicationDir + "/" + imageId + POSTFIX);
         try {
             Resource resource = new UrlResource(path.toUri());
@@ -76,10 +95,10 @@ public class FileStorageRepository {
     }
 
     /**
-     * @param image
-     * @return
-     * @throws NoSuchAlgorithmException
-     * @throws IOException
+     * Generates image id based on its hash.
+     *
+     * @param image input image.
+     * @return generated ID.
      */
     private String generateId(MultipartFile image) throws NoSuchAlgorithmException, IOException {
         MessageDigest md = MessageDigest.getInstance("MD5");

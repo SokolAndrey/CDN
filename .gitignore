@@ -30,6 +30,7 @@ gradle/wrapper/gradle-wrapper.properties
 
 # folders
 /out/
+/build/
 
 # Thumbnails
 ._*
